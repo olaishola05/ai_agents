@@ -12,7 +12,6 @@ from smolagents import (
     OpenAIServerModel,
     tool,
 )
-
 from utils.utils import extract_cuisines, format_cooking_plan, pick_cuisine
 
 ssl._create_default_https_context = ssl._create_unverified_context
