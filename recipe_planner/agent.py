@@ -54,32 +54,6 @@ def search_recipe(cuisine: str) -> str:
     )
 
 
-# def search_recipe(cuisine: str) -> str:
-#     """
-#     Searches for a recipe based on a cuisine type.
-
-#     Args:
-#         cuisine: The desired cuisine type (e.g. Italian, Mexican, Japanese).
-
-#     Returns:
-#         A recipe name and step-by-step cooking instructions.
-#     """
-#     query = urllib.parse.quote(cuisine)
-#     url = f"{themealdb_endpoint}/search.php?s={query}"
-
-#     with urllib.request.urlopen(url) as response:
-#         data = json.loads(response.read())
-
-#     if not data["meals"]:
-#         return f"No {cuisine} recipe found. Try a different cuisine."
-
-#     meal = data["meals"][0]
-#     name = meal["strMeal"]
-#     instructions = meal["strInstructions"][:1500]
-
-#     return f"Recipe: {name}\n\nInstructions:\n{instructions}"
-
-
 ingredients = input("Enter ingredients you have (comma-separated): ").strip()
 
 if not ingredients:
