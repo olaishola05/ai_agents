@@ -12,7 +12,12 @@ from smolagents import (
     OpenAIServerModel,
     tool,
 )
-from utils.utils import extract_cuisines, format_cooking_plan, pick_cuisine
+from utils.utils import (
+    extract_cuisines,
+    extract_ingredients,
+    format_cooking_plan,
+    pick_cuisine,
+)
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -25,10 +30,8 @@ grok_api_key = os.getenv("GROK_API_KEY")
 def search_recipe(cuisine: str) -> str:
     """
     Searches for a recipe based on a cuisine type.
-
     Args:
         cuisine: The desired cuisine type (e.g. Italian, Mexican, Japanese).
-
     Returns:
         A recipe name and step-by-step cooking instructions.
     """
@@ -44,8 +47,37 @@ def search_recipe(cuisine: str) -> str:
     meal = data["meals"][0]
     name = meal["strMeal"]
     instructions = meal["strInstructions"][:1500]
+    return (
+        f"RECIPE NAME: {name}\n\n"
+        f"INGREDIENTS NEEDED:\n{extract_ingredients(meal)}\n\n"
+        f"COOKING INSTRUCTIONS:\n{instructions}"
+    )
 
-    return f"Recipe: {name}\n\nInstructions:\n{instructions}"
+
+# def search_recipe(cuisine: str) -> str:
+#     """
+#     Searches for a recipe based on a cuisine type.
+
+#     Args:
+#         cuisine: The desired cuisine type (e.g. Italian, Mexican, Japanese).
+
+#     Returns:
+#         A recipe name and step-by-step cooking instructions.
+#     """
+#     query = urllib.parse.quote(cuisine)
+#     url = f"{themealdb_endpoint}/search.php?s={query}"
+
+#     with urllib.request.urlopen(url) as response:
+#         data = json.loads(response.read())
+
+#     if not data["meals"]:
+#         return f"No {cuisine} recipe found. Try a different cuisine."
+
+#     meal = data["meals"][0]
+#     name = meal["strMeal"]
+#     instructions = meal["strInstructions"][:1500]
+
+#     return f"Recipe: {name}\n\nInstructions:\n{instructions}"
 
 
 ingredients = input("Enter ingredients you have (comma-separated): ").strip()
@@ -97,9 +129,10 @@ recipe_agent = CodeAgent(
 result = recipe_agent.run(
     f"I have these ingredients: {ingredients}. "
     f"I want to cook {chosen_cuisine} food. "
-    f"Search for a suitable recipe and present a clear, "
-    f"formatted step-by-step cooking plan with sections for "
-    f"Ingredients and Steps."
+    f"Use the search_recipe tool to find a recipe, then output the FULL response "
+    f"from the tool exactly as returned, including the recipe name, "
+    f"all ingredients, and all cooking instructions step by step. "
+    f"Do not summarize or shorten the instructions."
 )
 
 format_cooking_plan(result)

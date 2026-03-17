@@ -9,7 +9,6 @@ def format_cooking_plan(result: Any) -> None:
     print("        🍽️  YOUR COOKING PLAN")
     print("=" * 40 + "\n")
 
-    # Bold section headers if they exist (Step 1, Ingredients, etc.)
     lines = result.strip().split("\n")
     for line in lines:
         if re.match(
@@ -67,14 +66,21 @@ def extract_cuisines(suggestions: Any) -> list[str]:
     Parses the agent's numbered list response into a clean Python list.
     Handles formats like: '1. Italian', '1) Italian', '- Italian'
     """
-    # print(suggestions, "My suggestions")
-    # lines = suggestions.strip().split("\n")
     cuisines = []
     for line in suggestions:
-        # Strip numbering, bullets, dashes
         cleaned = re.sub(r"^[\d\.\)\-\*\s]+", "", line).strip()
-        # Take only the cuisine name (before any dash or colon explanation)
         cleaned = re.split(r"[-–:]", cleaned)[0].strip()
         if cleaned:
             cuisines.append(cleaned)
     return cuisines
+
+
+def extract_ingredients(meal: dict) -> str:
+    """Pulls ingredients and measures from MealDB meal object."""
+    ingredients = []
+    for i in range(1, 21):
+        ingredient = (meal.get(f"strIngredient{i}") or "").strip()  # ← or ""
+        measure = (meal.get(f"strMeasure{i}") or "").strip()
+        if ingredient:
+            ingredients.append(f"  - {measure} {ingredient}".strip())
+    return "\n".join(ingredients)
